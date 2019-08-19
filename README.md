@@ -148,6 +148,7 @@ ffmpeg -rtsp_transport tcp -stimeout 3000000 -i rtsp://user:pass@192.168.1.2:554
      - Test function to calculate video duration for all segments
      - Service entry to get the number of segments and duration so far
  - Check if the ffmpeg subprocess has died and restart it for every stream
+ - Add alias to stream (save stream as an alias instead the stream path/uri)
  - test with more cameras
 
 License

@@ -9,7 +9,7 @@
             <param name="vcodec" value="copy" />
             <param name="fps" value="15" />
             <param name="video_bitrate" value="900k" />
-            <param name="publish_screenshots" value="true"/>
+            <param name="publish_screenshots" value="false"/>
             <param name="publish_screenshots_rate_seconds" value="2"/> <!-- cannot be less than 1, value in seconds -->
             <param name="segment_time" value="300"/>
             <param name="segment_format" value="matroska"/>
