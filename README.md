@@ -21,6 +21,28 @@ $ sudo add-apt-repository ppa:jonathonf/ffmpeg-4 -y
 $ sudo apt update
 $ sudo apt install ffmpeg -y
 ```
+#### Installing on ubuntu 18.04
+To run the package on ubutnu 18.04 install the specific packages:
+
+- Download FFmpeg 2.8.6 from our repository or (https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/ffmpeg/7:2.8.6-1ubuntu2/ffmpeg_2.8.6.orig.tar.xz) and follow the steps bellow
+
+```bash
+$ sudo apt install yasm
+$ tar -xvf ffmpeg_2.8.6.orig.tar.xz
+$ cd ffmpeg_2.8.6
+$ ./configure
+$ make
+$ sudo make install
+```
+
+- Install ffmpeg-python 0.2.0 with the steps bellow
+
+```bash
+$ sudo apt install python-testresources
+$ pip install --upgrade setuptools
+$ pip install ffmpeg-python
+```
+
 
 ### How to run
 
