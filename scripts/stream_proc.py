@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 import datetime
 import fcntl
@@ -8,7 +8,7 @@ import re
 import signal
 import time
 from collections import OrderedDict
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 import cv2
 import ffmpeg
@@ -163,7 +163,7 @@ class StreamProc:
             self.proc.send_signal(signal.SIGINT)
             self.wait_for_process_finished()
         except OSError as e:
-            print "Error stopping ffmpeg for uri:{} {}".format(self.stream_uri, e)
+            print ("Error stopping ffmpeg for uri:{} {}".format(self.stream_uri, e))
 
         # force terminate the process
         if self.proc.poll() is None:
