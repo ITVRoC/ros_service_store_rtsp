@@ -1,8 +1,8 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 import rospy
 from ros_service_store_rtsp.srv import StoreRTSP, StoreRTSPResponse
-from urlparse import urlparse
+from urllib.parse import urlparse
 import glob
 import datetime
 import re
