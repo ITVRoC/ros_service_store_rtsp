@@ -43,15 +43,6 @@ $ pip install --upgrade setuptools
 $ pip install ffmpeg-python
 ```
 
-#### Installing on ubuntu 20.04
-
-- Clone the files from Ubuntu 20.04 branch to your workspace.
-
-- Install the ffmpeg-python module to the environment with the command:
-```bash
-$ pip3 install ffmpeg-python
-```
-
 
 ### How to run
 
