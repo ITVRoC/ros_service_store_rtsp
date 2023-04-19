@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 PKG = 'ros_service_store_rtsp'
 import roslib
 roslib.load_manifest(PKG)  # This line is not needed with Catkin.
