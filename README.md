@@ -45,8 +45,11 @@ $ pip install ffmpeg-python
 
 #### Installing on ubuntu 20.04
 
-- Clone the files from Ubuntu 20.04 branch to your workspace.
-
+- Clone the files from Ubuntu 20.04 branch to your workspace following the steps below:
+```bash
+$ cd ~/catkin_ws/src
+$ git clone -b ubuntu-20.04 --single-branch https://github.com/ITVRoC/ros_service_store_rtsp.git
+```
 - Install the ffmpeg-python module to the environment with the command:
 ```bash
 $ pip3 install ffmpeg-python
