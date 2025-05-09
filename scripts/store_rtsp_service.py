@@ -31,6 +31,7 @@ class StoreStreamService:
         self.process_dict = {}
         self.segment_time = segment_time
         self.segment_format = segment_format
+        self.timestamp_zero = None      # start as None to be replaced by the first timestamp read
 
     def get_output_filename(self, stream_uri):
         """
@@ -53,6 +54,7 @@ class StoreStreamService:
                 exp_size = max(v_list)
 
         current_timestamp = datetime.datetime.now().strftime("%Y-%m-%d.%H.%M.%S")
+        if self.timestamp_zero is None: self.timestamp_zero = str(time.mktime(datetime.datetime.now().timetuple()) + datetime.datetime.now().microsecond / 1e6)
 
         exp_size += 1
         filename = os.path.join(self.base_output_path, "{}.{}.{}{}".format(exp_size, self.simplify_uri(stream_uri),
@@ -117,13 +119,21 @@ class StoreStreamService:
                     )
                 else:
                     rospy.loginfo("Stopped stream successfully: %s %s", request.stream_uri, msg)
-                    return StoreRTSPResponse(
+                    Response = StoreRTSPResponse(
                         success=True,
                         msg="Stopped stream successfully: {}".format(request.stream_uri),
                         filename=p_obj.get_output_filepath(),
                         duration_secs=p_obj.get_video_duration(),
                         wallclock_secs=int(time.time() - p_obj.get_start_time())
                     )
+                    try:
+                        filename = Response.filename.replace(self.extension, "-timestamp_zero.txt")
+                        with open(filename, 'w') as f:
+                            f.write(self.timestamp_zero)
+                    except Exception as e:
+                        rospy.logerr("Failed to add timestamp_zero metadata: %s", str(e))
+
+                    return Response
             else:
                 rospy.loginfo("Cannot stop stream, stream not found: %s", request.stream_uri)
                 return StoreRTSPResponse(
