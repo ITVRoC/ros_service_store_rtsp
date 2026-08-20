@@ -10,7 +10,6 @@ import os
 import time
 from stream_proc import StreamProc
 from sensor_msgs.msg import Image
-from std_msgs.msg import Bool
 from cv_bridge import CvBridge, CvBridgeError
 import re
 from threading import Thread
@@ -32,12 +31,8 @@ class StoreStreamService:
         self.process_dict = {}
         self.segment_time = segment_time
         self.segment_format = segment_format
-        
-        
-        self.rtsp_publisher = rospy.Publisher('/rtsp_status', Bool, queue_size=1, latch=True)
-        self.rtsp_status = Bool()
-        self.rtsp_status.data = False
-        
+        self.timestamp_zero = None      # start as None to be replaced by the first timestamp read
+
     def get_output_filename(self, stream_uri):
         """
         Define new output filename for the streamed video
@@ -59,6 +54,7 @@ class StoreStreamService:
                 exp_size = max(v_list)
 
         current_timestamp = datetime.datetime.now().strftime("%Y-%m-%d.%H.%M.%S")
+        if self.timestamp_zero is None: self.timestamp_zero = str(time.mktime(datetime.datetime.now().timetuple()) + datetime.datetime.now().microsecond / 1e6)
 
         exp_size += 1
         filename = os.path.join(self.base_output_path, "{}.{}.{}{}".format(exp_size, self.simplify_uri(stream_uri),
@@ -111,6 +107,7 @@ class StoreStreamService:
         if not request.is_to_store:
             if is_stream_already_processed:
                 rospy.loginfo("Stopping stream: %s", request.stream_uri)
+
                 p_obj = self.process_dict.pop(request.stream_uri, None)
                 is_stop_successful, msg = p_obj.stop_recording()
 
@@ -122,15 +119,21 @@ class StoreStreamService:
                     )
                 else:
                     rospy.loginfo("Stopped stream successfully: %s %s", request.stream_uri, msg)
-                    self.rtsp_status.data = False
-                    self.rtsp_publisher.publish(self.rtsp_status)
-                    return StoreRTSPResponse(
+                    Response = StoreRTSPResponse(
                         success=True,
                         msg="Stopped stream successfully: {}".format(request.stream_uri),
                         filename=p_obj.get_output_filepath(),
                         duration_secs=p_obj.get_video_duration(),
                         wallclock_secs=int(time.time() - p_obj.get_start_time())
                     )
+                    try:
+                        filename = Response.filename.replace(self.extension, "-timestamp_zero.txt")
+                        with open(filename, 'w') as f:
+                            f.write(self.timestamp_zero)
+                    except Exception as e:
+                        rospy.logerr("Failed to add timestamp_zero metadata: %s", str(e))
+
+                    return Response
             else:
                 rospy.loginfo("Cannot stop stream, stream not found: %s", request.stream_uri)
                 return StoreRTSPResponse(
@@ -164,8 +167,7 @@ class StoreStreamService:
                 if is_recording:
                     rospy.loginfo("Recording stream: %s", request.stream_uri)
                     self.process_dict[request.stream_uri] = stream_proc
-                    self.rtsp_status.data = True
-                    self.rtsp_publisher.publish(self.rtsp_status)
+
                     return StoreRTSPResponse(
                         success=True,
                         filename=output_filepath,
@@ -296,7 +298,7 @@ if __name__ == "__main__":
         except OSError:
             if not os.path.isdir(arg_base_output_path):
                 raise
-            
+
     store_service = StoreStreamService(
         base_output_path=arg_base_output_path,
         extension=arg_extension,
